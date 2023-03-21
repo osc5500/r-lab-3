@@ -1,0 +1,211 @@
+---
+title: "Intermediate ggplot"
+author: "Jeremy Morris"
+affiliation-title: "University of Utah"
+date: last-modified
+title-block-style: default
+title-block-banner: true
+format: 
+  html:
+      embed-resources: true
+      theme: flatly
+      code-block-bg: true
+      code-block-border-left: "#31BAE9"
+      highlight-style: printing
+execute:
+    message: false
+    warning: false
+    error: false
+---
+
+```{r setup}
+#| echo: false
+library(tidyverse)
+```
+
+# Intermediate ggplot
+
+In this lab, we'll learn about a few additional options to customize charts. In the prior lab, we looked at using different geometric objects, themes and labels. Here we will learn more specifics about geometric objects and aesthetic mappings. We will also look at how to modify scales using scale functions. The idea is to learn everything needed to create the charts specified in this assignment.
+
+## Review
+
+`ggplot()` is the generic function call. A plot can include any of the following objects.
+
+* `ggplot` - the primary building block of a chart. By itself only generates a blank chart.
+* `aes` - short for 'aesthetic mapping'. This function tells the plot how to map data to different portions of the chart (e.g. x-axis,y-axis,fill,etc.)
+* `geom` - short for 'geometric object'. These are the actual charts,a short list of options follows.
+    * `geom_point` - scatterplot
+    * `geom_bar` - bar chart
+    * `geom_line` - line chart
+* `labs` - chart labels and titles
+* `coord` - functions to modify the coordinate space. The most commonly used is `coord_flip` to rotate a chart 90 degrees.
+* `facet` - these control how many charts are shown. We will cover these in more detail in the next lab.
+* `theme` - functions to modify the overall look and feel over the chart.
+
+The great thing about ggplot is that it allows you to control nearly every aspect of a data visualization. Because there is so much control,there is also a learning curve associated with that level of control.
+
+Following is an example chart showing all of the relevant options highlighted above. 
+
+```{r hw}
+#| echo: false
+#| message: false
+df_heightweight <- read_csv('_data/heightweight.csv')
+```
+
+```{r hw-chart1}
+ggplot(df_heightweight) +  
+	geom_point(aes(x=ageYear,y=heightIn,color=sex)) +
+	labs(x='Age (Years)',y='Height (In)',color='Sex',
+		 title='Height Increases with Age',
+		 subtitle='This is a subtitle',
+		 caption='This is a caption') +
+	theme_bw()
+```
+
+## Details on the basics
+
+The basic building blocks of a chart are the following.
+
+* `ggplot` -- this is the primary function that generates a chart. You cannot create a chart w/o it.
+* `aes` -- this specifies the aesthetic mapping. An aesthetic mapping matches columns in a data set to different parts of a chart.
+* `geom_` -- short for "geometric object", folling the underscore will be the name of the geometric object. There is a geometric object (or geom) for every chart type available in ggplot.
+
+With these three things, we can generate almost any basic chart we like.
+
+### Aesthetic Mappings
+
+Aesthetic mappings determine which data is charted and where it is located. The location of data depends on the chart type. For example, you can specify `x` and `y` for a scatterplot but you can only specify `x` for a density plot (this is b/c the chart calculates the `y` axis values for you). Following is a list of the primary aesthetic mappings available in `ggplot`.
+
+* `x` -- x-axis
+* `y` -- y-axis
+* `color` (or `colour`) -- the color of dots and lines in a chart. Can be specified using a list of color names or by specifying a hex code.
+* `fill` -- the color of the area within lines (e.g. the inside of a bar chart or the inside of a boxplot). Can be specified using a list of color names or by specifying a hex code.
+* `shape` -- different shapes can be charted instead of points on a scatterplot (I'm not aware of any other chart that uses a shape at this time).
+* `size` -- point size on scatterplots
+
+Aesthetic mappings can be specified in the call to `ggplot` or in the call to a specific geometric object. If the aesthetic mapping is specified in the call to `ggplot` it will be used for all geometric objects, unless a mapping is specified in the geometric object. For example, you can see that these two calls generate the same plot.
+
+```{r ggplot-ex}
+ggplot(df_heightweight,aes(x=ageYear,y=heightIn)) +
+    geom_point()
+```
+
+```{r geom-ex}
+ggplot(df_heightweight) +
+    geom_point(aes(x=ageYear,y=heightIn))
+```
+
+The ability to specify aesthetic mappings in different levels of a chart allows for a lot of flexibility. You can either re-use the aesthetic mapping in all geometric objects or you can have each geometric object use its own mapping. 
+
+We can see how this works with the following example. Here we are trying to chart vehicle weight against miles-per-gallon and have added a series for the number of cylinders. We have specified all aesthetic mappings in the call to `ggplot` which means they will apply to all geometric objects. As you can see, this means that `ggplot` will add a trendline for each value in the `color` mapping. It is hard to read and (probably) not what we wanted.
+
+```{r geom-ex2}
+ggplot(mtcars,aes(x=wt,y=mpg,color=factor(cyl))) +
+    geom_point() +
+    geom_smooth(method='lm',se=FALSE)
+```
+
+In order to fix this, we can move the aesthetic mappings around to get one trendline as follows. Note that now we have specified `x` and `y` in the top-level call but move the mapping to color into the call for `geom_point`. This means that mapping only applies to the point-plot and not to the smoothing object.
+
+```{r geom-ex3}
+ggplot(mtcars,aes(x=wt,y=mpg)) +
+    geom_point(aes(color=factor(cyl))) +
+    geom_smooth(method='lm',se=FALSE)
+```
+
+At the risk of making this too complicated, the following code could also be used to generate the same chart. Now we're only specifying aesthetic mappings in the geometric objects. This is fine, but it might be less efficient since the mappings to `x` and `y` are repeated. If you ever wanted to reuse the chart but change `x` and `y`, you would have to do that in two places.
+
+```{r geom-ex4}
+ggplot(mtcars) +
+    geom_point(aes(x=wt,y=mpg,color=factor(cyl))) +
+    geom_smooth(aes(x=wt,y=mpg),method='lm',se=FALSE)
+```
+
+### Geometric Objects
+
+There are quite a few geometric objects available in `ggplot` itself and you can add more using external packages. Each geometric object will work slightly differently and will expect different aesthetic mappings depending on how it works. The best thing to do might be to refer to the documentation when you want to create a specific kind of chart. The list of functions can be found [here](https://ggplot2.tidyverse.org/reference/index.html#geoms).
+
+For this assignment, we will use `geom_point`, `geom_col` and `geom_smooth` (to create the trendline in question 2). We have seen examples of `geom_point` and `geom_smooth` above. `geom_col` is used to create bar charts. You could also use `geom_bar`, I don't like using that function b/c it expects to do some math for you. When creating charts in R, I prefer to do the math on my own so I know how things are calculated. You won't have to do any data manipulation for this assignment, that will be done for you. For the following example, I'll calculate the average mpg by the number of cylinders and then create a bar chart.
+
+:::{.callout-note}
+Notice that I'm converting cylinders to a factor so that the chart doesn't interpret that as a number but as text. The advantage of using a factor is that I can specify the order of the values if I want to.
+:::
+
+```{r bar1}
+cyl_summary <- mtcars |> 
+    mutate(cyl=as.factor(cyl)) |> 
+    summarise(avg_mpg=mean(mpg),.by=cyl)
+
+ggplot(cyl_summary) +
+    geom_col(aes(x=cyl,y=avg_mpg))
+```
+
+In the most recent version of `ggplot2` I can create a horizontal bar chart by simply changing the aesthetic mapping (swapping `x` and `y`).
+
+```{r bar2}
+ggplot(cyl_summary) +
+    geom_col(aes(x=avg_mpg,y=cyl))
+```
+
+Note that you don't need to specify `x` first:
+
+```{r bar3}
+ggplot(cyl_summary) +
+    geom_col(aes(y=cyl,x=avg_mpg))
+```
+
+And, to show how it is done, I'll show here how you can rearrange the cylinder values by specifying the order of the levels in the factor. At the same time, I have specified a fixed color for all bars. This is done by putting the `fill` mapping outside the aesthetic mapping. This will make the color fixed for all parts of the chart.
+
+```{r bar4}
+cyl_summary_order <- mtcars |> 
+    mutate(cyl=factor(cyl,levels=c(8,6,4))) |> 
+    summarise(avg_mpg=mean(mpg),.by=cyl)
+
+ggplot(cyl_summary_order) +
+    geom_col(aes(y=cyl,x=avg_mpg),fill='#F26419')
+```
+
+If we want the colors to be different colors, then we put the cylinder variable in the aesthetic mapping. Also, we can specify which colors to use by using the `scale_manual_fill` function (more on this in the next section). You will need to specify one color for each level in the variable (and you are able to specify the same color multiple times). If you don't specify colors in this way, `ggplot` will use its default color pallet. I use a color pallete generator to get colors, my favorite is called [coolors](https://coolors.co).
+
+```{r bar5}
+ggplot(cyl_summary_order) +
+    geom_col(aes(y=cyl,x=avg_mpg,fill=cyl)) +
+    scale_fill_manual(values=c('#F26419','#F6AE2D','#33658A'))
+```
+
+## Scale Functions
+
+For this lab, we will need to use [scale functions](https://ggplot2.tidyverse.org/reference/index.html#scales) to adjust how the scales look. These functions control how scales function and can be used to override default behavior. Nearly everything about the scale can be controlled using a scale function. The only elements of the scale that can't be controlled are the look and feel which can be controlled by using the `theme` function.
+
+We'll use at least two and maybe three scale functions as follows.
+
+* `scale_x_continuous` -- modifies the x-axis when it is mapped to a continuous variable.
+* `scale_y_continuous` -- modifies the y-axis when it is mapped to a continuous variable.
+* `scale_fill_manual` -- modifies a scale based on the `fill` mapping. This one will be optional if you want to control which colors get selected when charting the fill or color.
+
+The assignment specifies that you need to "Modify the scales so the values are labeled properly". This means that if the data in the scale is dollars, you need to mak the axis labels look like dollars. By default, `ggplot` will likely display large values in scientific notation. These scale functions can be used to change the labels so they show commas or are formatted in dollars.
+
+The following creates some dummy data with large values for an example.
+
+```{r large-example}
+ex_data <- tibble(v1=rnorm(100,mean=100000,sd=5000),
+                  v2=rnorm(100,mean=500000,sd=1000))
+```
+
+The following code displays the x-axis in dollars and the y-axis using commas. The formatting functions come from the `scales` package. I've also applied a theme and adjusted the labels to make the chart look better.
+
+:::{.callout-note}
+There are at least two ways to load or refernce external packages in R. The first is to load the package using the `library` function. This loads all functions in the package into memory. Then you can refer to each function whenever you need it. 
+
+The second way is to use the double colon `::`. The advantage of this method is that you don't need to load the package into memory. This method also makes it clear where you are getting the function which could be helpful to others (or yourself) reading your code.
+:::
+
+```{r scale-example}
+ggplot(ex_data) + 
+    geom_point(aes(x=v1,y=v2)) +
+    scale_x_continuous(labels=scales::dollar) +
+    scale_y_continuous(labels=scales::comma) +
+    labs(x='Variable 1 in Dollars',y='Variable 2 with commas') +
+    theme_classic()
+```
+

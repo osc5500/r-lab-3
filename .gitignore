@@ -37,3 +37,8 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+*.html
+*.Rproj
+lab-prep.R
+*-answer.qmd

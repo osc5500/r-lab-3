@@ -1,0 +1,48 @@
+---
+title: "Intermediate ggplot -- Assignment"
+author: "Jeremy Morris"
+affiliation-title: "University of Utah"
+date: last-modified
+title-block-style: default
+title-block-banner: true
+format: 
+  html:
+      embed-resources: true
+      theme: flatly
+      code-block-bg: true
+      code-block-border-left: "#31BAE9"
+      highlight-style: printing
+execute:
+    message: false
+    warning: false
+    error: false
+---
+
+# Assignment
+
+The `r-lab-3-template.qmd` file imports two data sets as follows.
+
+* cities -- City level data showing various mortgage and income related variables
+* states -- State-level averages for all metrics from the above data set
+
+Using those data sets, create the following charts.
+
+1. Horizontal bar chart showing average median_household_income by state and color the bars by region.
+    * Use the "state_sorted_household_income" field to get the state.
+2. Scatterplot showing the monthly median household income on the x-axis and the monthly mortgage payment on the y-axis for each city. Color each dot according to its assigned region.
+    * Add a linear trendline.
+
+For each of the charts, include the following.
+
+* Apply a theme to each plot.
+* Modify the scales so the values are labeled properly.
+* Label all axes.
+* Add a title to both charts.
+    
+In the section labeled "Observations" provide your thoughts on the following topics.
+
+* What insights do you gain from each chart?
+* In the second chart, what does it mean when a dot is above the trendline?
+    * What does it mean when a dot is below the tredline?
+* How would the trendline help you to decide which city to live in?
+    * Justify your answer from above.
