@@ -68,20 +68,20 @@ The basic building blocks of a chart are the following.
 
 * `ggplot` -- this is the primary function that generates a chart. You cannot create a chart w/o it.
 * `aes` -- this specifies the aesthetic mapping. An aesthetic mapping matches columns in a data set to different parts of a chart.
-* `geom_` -- short for "geometric object", folling the underscore will be the name of the geometric object. There is a geometric object (or geom) for every chart type available in ggplot.
+* `geom_` -- short for "geometric object", following the underscore will be the name of the geometric object. There is a geometric object (or geom) for every chart type available in ggplot.
 
 With these three things, we can generate almost any basic chart we like.
 
 ### Aesthetic Mappings
 
-Aesthetic mappings determine which data is charted and where it is located. The location of data depends on the chart type. For example, you can specify `x` and `y` for a scatterplot but you can only specify `x` for a density plot (this is b/c the chart calculates the `y` axis values for you). Following is a list of the primary aesthetic mappings available in `ggplot`.
+Aesthetic mappings determine which data is charted and where it is located. The location of data depends on the chart type. For example, you can specify `x` and `y` for a scatter plot but you can only specify `x` for a density plot (this is b/c the chart calculates the `y` axis values for you). Following is a list of the primary aesthetic mappings available in `ggplot`.
 
 * `x` -- x-axis
 * `y` -- y-axis
-* `color` (or `colour`) -- the color of dots and lines in a chart. Can be specified using a list of color names or by specifying a hex code.
-* `fill` -- the color of the area within lines (e.g. the inside of a bar chart or the inside of a boxplot). Can be specified using a list of color names or by specifying a hex code.
-* `shape` -- different shapes can be charted instead of points on a scatterplot (I'm not aware of any other chart that uses a shape at this time).
-* `size` -- point size on scatterplots
+* `color` (or `colour`) -- the color of dots and lines in a chart. Can be specified using a list of color names or by specifying a hex code. (Note: the creator of `ggplot2` is from New Zealand so you will see some English spellings in some places.)
+* `fill` -- the color of the area within lines (e.g. the inside of a bar chart or the inside of a box plot). Can be specified using a list of color names or by specifying a hex code.
+* `shape` -- different shapes can be charted instead of points on a scatter plot (I'm not aware of any other chart that uses a shape at this time).
+* `size` -- point size on scatter plots
 
 Aesthetic mappings can be specified in the call to `ggplot` or in the call to a specific geometric object. If the aesthetic mapping is specified in the call to `ggplot` it will be used for all geometric objects, unless a mapping is specified in the geometric object. For example, you can see that these two calls generate the same plot.
 
@@ -165,7 +165,7 @@ ggplot(cyl_summary_order) +
     geom_col(aes(y=cyl,x=avg_mpg),fill='#F26419')
 ```
 
-If we want the colors to be different colors, then we put the cylinder variable in the aesthetic mapping. Also, we can specify which colors to use by using the `scale_manual_fill` function (more on this in the next section). You will need to specify one color for each level in the variable (and you are able to specify the same color multiple times). If you don't specify colors in this way, `ggplot` will use its default color pallet. I use a color pallete generator to get colors, my favorite is called [coolors](https://coolors.co).
+If we want the colors to be different colors, then we put the cylinder variable in the aesthetic mapping. Also, we can specify which colors to use by using the `scale_manual_fill` function (more on this in the next section). You will need to specify one color for each level in the variable (and you are able to specify the same color multiple times). If you don't specify colors in this way, `ggplot` will use its default color pallet. I use a color pallete generator to get colors, my favorite is [coolors](https://coolors.co).
 
 ```{r bar5}
 ggplot(cyl_summary_order) +
@@ -209,3 +209,8 @@ ggplot(ex_data) +
     theme_classic()
 ```
 
+## Final notes
+
+In this lab, we covered a few topics that should help you to complete the assignment. The other topics (labeling axes and themes) were covered in the previous lab. You should be able to refer to that lab for those topics.
+
+Good luck and let us know if you have any issues.
